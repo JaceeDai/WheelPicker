@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -20,7 +21,6 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.Scroller;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -74,7 +74,7 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
     private OnWheelChangeListener mOnWheelChangeListener;
 
     private Rect mRectDrawn;
-    private Rect mRectIndicatorHead, mRectIndicatorFoot;
+    private Rect mRectIndicatorHead, mRectIndicatorFoot, mRectIndicatorArea;
     private Rect mRectCurrentItem;
 
     private Camera mCamera;
@@ -137,6 +137,10 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
      * @see #setIndicatorColor(int)
      */
     private int mIndicatorColor;
+
+    private Drawable mIndicatorBackground;
+
+    private int mIndicatorBackgroundSize;
 
     /**
      * 幕布颜色
@@ -316,6 +320,8 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
         mIndicatorColor = a.getColor(R.styleable.WheelPicker_wheel_indicator_color, 0xFFEE3333);
         mIndicatorSize = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_indicator_size,
                 getResources().getDimensionPixelSize(R.dimen.WheelIndicatorSize));
+        mIndicatorBackground = a.getDrawable(R.styleable.WheelPicker_wheel_indicator_background);
+        mIndicatorBackgroundSize = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_indicator_background_size, 0);
         hasCurtain = a.getBoolean(R.styleable.WheelPicker_wheel_curtain, false);
         mCurtainColor = a.getColor(R.styleable.WheelPicker_wheel_curtain_color, 0x88FFFFFF);
         hasAtmospheric = a.getBoolean(R.styleable.WheelPicker_wheel_atmospheric, false);
@@ -356,6 +362,7 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 
         mRectIndicatorHead = new Rect();
         mRectIndicatorFoot = new Rect();
+        mRectIndicatorArea = new Rect();
 
         mRectCurrentItem = new Rect();
 
@@ -528,6 +535,8 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
                 mRectDrawn.right, indicatorHeadCenterY + halfIndicatorSize);
         mRectIndicatorFoot.set(mRectDrawn.left, indicatorFootCenterY - halfIndicatorSize,
                 mRectDrawn.right, indicatorFootCenterY + halfIndicatorSize);
+        int backgroundOffset = mIndicatorBackgroundSize > 0 ? mIndicatorBackgroundSize / 2 : mHalfItemHeight;
+        mRectIndicatorArea.set(mRectDrawn.left, mWheelCenterY - backgroundOffset, mRectDrawn.right, mWheelCenterY + backgroundOffset);
     }
 
     private void computeCurrentItemRect() {
@@ -542,6 +551,12 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
             mOnWheelChangeListener.onWheelScrolled(mScrollOffsetY);
         if(mData.size() == 0)
             return;
+        if (hasIndicator) {
+            if (mIndicatorBackground != null) {
+                mIndicatorBackground.setBounds(mRectIndicatorArea);
+                mIndicatorBackground.draw(canvas);
+            }
+        }
         int drawnDataStartPos = -mScrollOffsetY / mItemHeight - mHalfDrawnItemCount;
         for (int drawnDataPos = drawnDataStartPos + mSelectedItemPosition,
              drawnOffsetPos = -mHalfDrawnItemCount;
@@ -664,10 +679,12 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
         // 是否需要绘制指示器
         // Need to draw indicator or not
         if (hasIndicator) {
-            mPaint.setColor(mIndicatorColor);
-            mPaint.setStyle(Paint.Style.FILL);
-            canvas.drawRect(mRectIndicatorHead, mPaint);
-            canvas.drawRect(mRectIndicatorFoot, mPaint);
+            if (mIndicatorBackground == null) {
+                mPaint.setColor(mIndicatorColor);
+                mPaint.setStyle(Paint.Style.FILL);
+                canvas.drawRect(mRectIndicatorHead, mPaint);
+                canvas.drawRect(mRectIndicatorFoot, mPaint);
+            }
         }
         if (isDebug) {
             mPaint.setColor(0x4433EE33);
