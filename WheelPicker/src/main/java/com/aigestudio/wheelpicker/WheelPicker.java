@@ -142,6 +142,12 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 
     private int mIndicatorBackgroundSize;
 
+    private Drawable mIndicatorCheck;
+
+    private int mIndicatorCheckMargin;
+
+    private static final int INDICATOR_CHECK_MARGIN_DEFAULT = 16;
+
     /**
      * 幕布颜色
      *
@@ -298,6 +304,8 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
     public WheelPicker(Context context, AttributeSet attrs) {
         super(context, attrs);
 
+        final float density = context.getResources().getDisplayMetrics().density;
+
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.WheelPicker);
         int idData = a.getResourceId(R.styleable.WheelPicker_wheel_data, 0);
         mData = Arrays.asList(getResources()
@@ -322,6 +330,8 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
                 getResources().getDimensionPixelSize(R.dimen.WheelIndicatorSize));
         mIndicatorBackground = a.getDrawable(R.styleable.WheelPicker_wheel_indicator_background);
         mIndicatorBackgroundSize = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_indicator_background_size, 0);
+        mIndicatorCheck = a.getDrawable(R.styleable.WheelPicker_wheel_indicator_check);
+        mIndicatorCheckMargin = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_indicator_check_margin, (int) (INDICATOR_CHECK_MARGIN_DEFAULT * density + .5f));
         hasCurtain = a.getBoolean(R.styleable.WheelPicker_wheel_curtain, false);
         mCurtainColor = a.getColor(R.styleable.WheelPicker_wheel_curtain_color, 0x88FFFFFF);
         hasAtmospheric = a.getBoolean(R.styleable.WheelPicker_wheel_atmospheric, false);
@@ -370,6 +380,10 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 
         mMatrixRotate = new Matrix();
         mMatrixDepth = new Matrix();
+
+        if (mIndicatorCheck != null) {
+            mIndicatorCheck.setBounds(0, 0, mIndicatorCheck.getIntrinsicWidth(), mIndicatorCheck.getIntrinsicHeight());
+        }
     }
 
     private void updateVisibleItemCount() {
@@ -684,6 +698,13 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
                 mPaint.setStyle(Paint.Style.FILL);
                 canvas.drawRect(mRectIndicatorHead, mPaint);
                 canvas.drawRect(mRectIndicatorFoot, mPaint);
+            }
+            if (mIndicatorCheck != null) {
+                canvas.save();
+                canvas.translate(mRectIndicatorArea.width() - mIndicatorCheckMargin - mIndicatorCheck.getIntrinsicWidth(),
+                        mWheelCenterY - (int) (mIndicatorCheck.getIntrinsicHeight() / 2));
+                mIndicatorCheck.draw(canvas);
+                canvas.restore();
             }
         }
         if (isDebug) {

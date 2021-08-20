@@ -17,6 +17,8 @@
         <attr name="wheel_indicator_size" format="dimension" />
         <attr name="wheel_indicator_background" format="reference|color" />
         <attr name="wheel_indicator_background_size" format="reference|dimension" />
+        <attr name="wheel_indicator_check" format="reference" />
+        <attr name="wheel_indicator_check_margin" format="reference|dimension" />
         <attr name="wheel_curtain" format="boolean" />
         <attr name="wheel_curtain_color" format="color" />
         <attr name="wheel_atmospheric" format="boolean" />
