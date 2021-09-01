@@ -1156,6 +1156,15 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
         invalidate();
     }
 
+    public Drawable getIndicatorBackground() {
+        return mIndicatorBackground;
+    }
+
+    public void setIndicatorBackground(Drawable indicatorBackground) {
+        mIndicatorBackground = indicatorBackground;
+        invalidate();
+    }
+
     /**
      * 滚轮选择器Item项被选中时监听接口
      *
