@@ -572,6 +572,9 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
                 mIndicatorBackground.draw(canvas);
             }
         }
+        if (mItemHeight == 0) {
+            return;
+        }
         int drawnDataStartPos = -mScrollOffsetY / mItemHeight - mHalfDrawnItemCount;
         for (int drawnDataPos = drawnDataStartPos + mSelectedItemPosition,
              drawnOffsetPos = -mHalfDrawnItemCount;
