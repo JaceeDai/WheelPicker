@@ -28,6 +28,3 @@ android {
 dependencies {
     implementation 'com.google.code.gson:gson:2.8.2'
 }
-
-//apply from : '/Users/jacee/projects/publisher.gradle'
-//apply from: 'nexus_upload.gradle'
